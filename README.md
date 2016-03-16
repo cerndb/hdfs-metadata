@@ -1,9 +1,15 @@
 Tool for gathering blocks and replicas meta data from HDFS.
 
+Build project:
+
+```
+bin/compile
+```
+
 Usage:
 
 ``` 
-./run <path>
+bin/run <path>
 ```
 
 Example output:
