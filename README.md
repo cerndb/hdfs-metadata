@@ -15,7 +15,7 @@ bin/run <path>
 Example output:
 
 ```
-[dlanza@itrac1511 hdfs-meta]$ ./run /user/hloader/SCADAR/VAC_LHC_LOAD.db/eventhistory_00100001_f/part-m-00000.avro
+[dlanza@itrac1511 hdfs-meta]$ bin/run /user/hloader/SCADAR/VAC_LHC_LOAD.db/eventhistory_00100001_f/part-m-00000.avro
 
 Showing information fo filer: hdfs://p01001532067275.cern.ch/user/hloader/SCADAR/VAC_LHC_LOAD.db/eventhistory_00100001_f/part-m-00000.avro
 	isDirectory: false
