@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.BlockStorageLocation;
@@ -18,7 +19,7 @@ public class GetMetadata {
 	public static void main(String[] args) throws IOException {
 
 		if (args.length != 1) {
-			System.err.println("You need to specify a file path as first argument");
+			System.err.println("You need to specify a path as first argument");
 			System.exit(1);
 		}
 
@@ -39,55 +40,78 @@ public class GetMetadata {
 		
 		FileSystem fs = FileSystem.get(conf);
 		FileStatus status = fs.getFileStatus(path);
-		BlockLocation[] locations = fs.getFileBlockLocations(status, 0, status.getLen());
+
+		System.out.println();
+		System.out.println("Showing metadata for: " + status.getPath());
+		System.out.println("	isDirectory: " + status.isDirectory());
+		System.out.println("	isFile: " + status.isFile());
+		System.out.println("	isSymlink: " + status.isSymlink());
+		System.out.println("	encrypted: " + status.isEncrypted());
+		System.out.println("	length: " + status.getLen());
+		System.out.println("	replication: " + status.getReplication());
+		System.out.println("	blocksize: " + status.getBlockSize());
+		System.out.println("	modification_time: " + new Date(status.getModificationTime()));
+		System.out.println("	access_time: " + new Date(status.getAccessTime()));
+		System.out.println("	owner: " + status.getOwner());
+		System.out.println("	group: " + status.getGroup());
+		System.out.println("	permission: " + status.getPermission());
+		System.out.println();
 		
+		if(!status.isFile()){
+			System.out.println("Block/replicas meta data is only shown for files.");
+			System.out.println();
+			return;
+		}
+		
+		BlockLocation[] locations = fs.getFileBlockLocations(status, 0, status.getLen());
 		BlockStorageLocation[] blockStorageLocations = ((DistributedFileSystem) fs)
 				.getFileBlockStorageLocations(Arrays.asList(locations));
-
-		System.out.println();
-		System.out.println("Showing information for: " + status);
-		System.out.println();
 		
 		for (int j = 0; j < blockStorageLocations.length; j++) {
-			BlockStorageLocation blockStorageLocation = blockStorageLocations[j];
-
 			System.out.println("Block (" + j + ") info:");
-			System.out.println("	Offset: " + blockStorageLocation.getOffset());
-			System.out.println("	Length: " + blockStorageLocation.getLength());
-
-			String[] cachedHosts = blockStorageLocation.getCachedHosts();
-			if (cachedHosts.length == 0) {
-				System.out.println("	No cached hosts");
-			}
-
-			System.out.println("	Hosts:");
-			VolumeId[] volumeIds = blockStorageLocation.getVolumeIds();
-			String[] hosts = blockStorageLocation.getHosts();
-			String[] names = blockStorageLocation.getNames();
-			String[] topologyPaths = blockStorageLocation.getTopologyPaths();
-			for (int i = 0; i < topologyPaths.length; i++) {
-				int diskId = getDiskId(volumeIds[i]);
-				
-				System.out.println("		Replica (" + i + "):");
-				System.out.println("			Host: " + hosts[i]);
-				
-				if(dataDirs != null && diskId < dataDirs.length)
-					System.out.println("			Location: " + dataDirs[diskId] + " (DiskId: " + diskId + ")");
-				else
-					System.out.println("			DiskId: " + diskId);
-				
-				System.out.println("			Name: " + names[i]);
-				System.out.println("			TopologyPaths: " + topologyPaths[i]);
-			}
-
-			if (cachedHosts.length > 0) {
-				System.out.println("	Cached hosts:");
-				for (String cachedHost : cachedHosts) {
-					System.out.println("		Host: " + cachedHost);
-				}
-			}
-
+			
+			printBlockMetadata(blockStorageLocations[j], dataDirs);
+			
 			System.out.println();
+		}
+	}
+
+	private static void printBlockMetadata(BlockStorageLocation blockStorageLocation, String[] dataDirs) 
+			throws IOException {
+		
+		System.out.println("	Offset: " + blockStorageLocation.getOffset());
+		System.out.println("	Length: " + blockStorageLocation.getLength());
+
+		String[] cachedHosts = blockStorageLocation.getCachedHosts();
+		if (cachedHosts.length == 0) {
+			System.out.println("	No cached hosts");
+		}
+
+		System.out.println("	Hosts:");
+		VolumeId[] volumeIds = blockStorageLocation.getVolumeIds();
+		String[] hosts = blockStorageLocation.getHosts();
+		String[] names = blockStorageLocation.getNames();
+		String[] topologyPaths = blockStorageLocation.getTopologyPaths();
+		for (int i = 0; i < topologyPaths.length; i++) {
+			int diskId = getDiskId(volumeIds[i]);
+			
+			System.out.println("		Replica (" + i + "):");
+			System.out.println("			Host: " + hosts[i]);
+			
+			if(dataDirs != null && diskId < dataDirs.length)
+				System.out.println("			Location: " + dataDirs[diskId] + " (DiskId: " + diskId + ")");
+			else
+				System.out.println("			DiskId: " + diskId);
+			
+			System.out.println("			Name: " + names[i]);
+			System.out.println("			TopologyPaths: " + topologyPaths[i]);
+		}
+
+		if (cachedHosts.length > 0) {
+			System.out.println("	Cached hosts:");
+			for (String cachedHost : cachedHosts) {
+				System.out.println("		Host: " + cachedHost);
+			}
 		}
 	}
 
