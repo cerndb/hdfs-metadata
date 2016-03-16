@@ -28,9 +28,11 @@ public class GetMetadata {
 		//Proper way would be to get it from each node
 		//Cluster with same configuration this is fine
 		String dataDirsParam = conf.get("dfs.data.dir");
+		if(dataDirsParam == null) 
+			dataDirsParam = conf.get("dfs.datanode.data.dir");
 		String[] dataDirs = null;
 		if(dataDirsParam == null){
-			System.err.println("WARNING: dfs.data.dir cofiguration parameter is not set, so location for replicas will not be shown.");
+			System.err.println("WARNING: dfs.data.dir or dfs.datanode.data.dir cofiguration parameter is not set, so location for replicas will not be shown.");
 		}else{
 			dataDirs = dataDirsParam.split(",");
 		}
@@ -42,6 +44,10 @@ public class GetMetadata {
 		BlockStorageLocation[] blockStorageLocations = ((DistributedFileSystem) fs)
 				.getFileBlockStorageLocations(Arrays.asList(locations));
 
+		System.out.println();
+		System.out.println("Showing information for: " + status);
+		System.out.println();
+		
 		for (int j = 0; j < blockStorageLocations.length; j++) {
 			BlockStorageLocation blockStorageLocation = blockStorageLocations[j];
 
