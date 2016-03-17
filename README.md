@@ -112,6 +112,12 @@ itrac1503.cern.ch        0 = = = = = 0 0 0 = = 0 = = 0 0 = 0 + = = = = = = = = 0
 itrac1511.cern.ch        0 = = = = = 0 = = = 0 0 = 0 = = 0 = = 0 0 = = 0 = + = = = = = 0 = = = = = = 0 + = = = = 0 = = = 0 0         64        1
 itrac1505.cern.ch        0 0 = = 0 0 + = = 0 0 = = 0 0 = 0 0 = = = 0 = 0 0 = = 0 = = = = 0 0 = = = 0 = = 0 = = 0 = + = = 0 0         42        0
 
+Leyend
+  0: no blocks in this disk
+  +: #blocks is more than 20% of the avergae of blocks per disk of this host
+  =: #blocks is aproximatilly the avergae of blocks per disk of this host
+  +: #blocks is less than 20% of the avergae of blocks per disk of this host
+  
  === Metadata of blocks and replicass ===
 
 Block (0) info:

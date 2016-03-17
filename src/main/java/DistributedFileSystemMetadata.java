@@ -225,6 +225,13 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 			
 			System.out.println((int) avg);
 		}
+		
+		System.out.println();
+		System.out.println("Leyend");
+		System.out.println("  0: no blocks in this disk");
+		System.out.println("  +: #blocks is more than 20% of the avergae of blocks per disk of this host");
+		System.out.println("  =: #blocks is aproximatilly the avergae of blocks per disk of this host");
+		System.out.println("  +: #blocks is less than 20% of the avergae of blocks per disk of this host");
 	}
 
 	private String[] getDataDirs() {
