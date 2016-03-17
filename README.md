@@ -9,13 +9,13 @@ bin/compile
 Usage:
 
 ``` 
-bin/run <path> [<max_number_of_blocks_to_print>]
+bin/hdfs-blkd <path> [<max_number_of_blocks_to_print>]
 ```
 
 Example output:
 
 ```
-[dlanza@itrac1505 hdfs-meta]$ bin/run /user/hloader/SCADAR/SURVEY_F3_LOAD.db/eventhistory_00100001 2
+[dlanza@itrac1505 hdfs-meta]$ bin/hdfs-blkd /user/hloader/SCADAR/SURVEY_F3_LOAD.db/eventhistory_00100001 2
 
 Showing metadata for: hdfs://p01001532067275.cern.ch/user/hloader/SCADAR/SURVEY_F3_LOAD.db/eventhistory_00100001
 	isDirectory: true
@@ -116,7 +116,7 @@ Leyend
   0: no blocks in this disk
   +: #blocks is more than 20% of the avergae of blocks per disk of this host
   =: #blocks is aproximatilly the avergae of blocks per disk of this host
-  +: #blocks is less than 20% of the avergae of blocks per disk of this host
+  -: #blocks is less than 20% of the avergae of blocks per disk of this host
   
  === Metadata of blocks and replicass ===
 
