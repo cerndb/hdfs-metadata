@@ -11,4 +11,4 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 HOME=$SCRIPT_DIR/..
 
-java -cp $HOME/target/*:/etc/hadoop/conf/:/usr/lib/hadoop-hdfs/lib/*:/usr/lib/hadoop/lib/*:/usr/lib/hadoop-hdfs/*:/usr/lib/hadoop/* GetMetadata "$@"
+java -cp $HOME/target/*:/etc/hadoop/conf/:/usr/lib/hadoop-hdfs/lib/*:/usr/lib/hadoop/lib/*:/usr/lib/hadoop-hdfs/*:/usr/lib/hadoop/* DistributedFileSystemMetadata "$@"
