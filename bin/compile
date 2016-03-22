@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Copyright (C) 2016, CERN
+# This software is distributed under the terms of the GNU General Public
+# Licence version 3 (GPL Version 3), copied verbatim in the file "LICENSE".
+# In applying this license, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as Intergovernmental Organization
+# or submit itself to any jurisdiction.
+
 # Environment variables for configuration
 # 
 # FORCE_JAVAC = true if you do not want to use Maven (default Maven is used)
