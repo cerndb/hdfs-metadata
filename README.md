@@ -74,16 +74,6 @@ Data directories and disk ids
   DiskId: 36  Directory: FILE:/data41/hadoop/hdfs/data
   DiskId: 37  Directory: FILE:/data42/hadoop/hdfs/data
   DiskId: 38  Directory: FILE:/data43/hadoop/hdfs/data
-  DiskId: 39  Directory: FILE:/data44/hadoop/hdfs/data
-  DiskId: 40  Directory: FILE:/data45/hadoop/hdfs/data
-  DiskId: 41  Directory: FILE:/data46/hadoop/hdfs/data
-  DiskId: 42  Directory: FILE:/data47/hadoop/hdfs/data
-  DiskId: 43  Directory: FILE:/data48/hadoop/hdfs/data
-  DiskId: 44  Directory: FILE:/data5/hadoop/hdfs/data
-  DiskId: 45  Directory: FILE:/data6/hadoop/hdfs/data
-  DiskId: 46  Directory: FILE:/data7/hadoop/hdfs/data
-  DiskId: 47  Directory: FILE:/data8/hadoop/hdfs/data
-  DiskId: 48  Directory: FILE:/data9/hadoop/hdfs/data
 
 16/03/17 17:41:57 WARN DistributedFileSystemMetadata: list of data nodes could not be got from API (requires higher privileges).
 16/03/17 17:41:57 WARN DistributedFileSystemMetadata: getting data node list from configuration file (may contain data nodes which are not active).
