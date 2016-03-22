@@ -1,4 +1,4 @@
-Tool for gathering blocks and replicas meta data from HDFS.
+Tool for gathering blocks and replicas meta data from HDFS. It also builds a heat map showing how replicas are distributed along disks and nodes.
 
 Build project:
 
@@ -15,9 +15,9 @@ bin/hdfs-blkd <path> [<max_number_of_blocks_to_print>]
 Example output:
 
 ```
-[dlanza@itrac1505 hdfs-meta]$ bin/hdfs-blkd /user/hloader/SCADAR/SURVEY_F3_LOAD.db/eventhistory_00100001 2
+[user@machine-1]$ bin/hdfs-blkd /user/ 2
 
-Showing metadata for: hdfs://p01001532067275.cern.ch/user/hloader/SCADAR/SURVEY_F3_LOAD.db/eventhistory_00100001
+Showing metadata for: hdfs://machine-1.cern.ch/user/
 	isDirectory: true
 	isFile: false
 	isSymlink: false
@@ -27,14 +27,13 @@ Showing metadata for: hdfs://p01001532067275.cern.ch/user/hloader/SCADAR/SURVEY_
 	blocksize: 0
 	modification_time: Tue Mar 15 13:48:08 CET 2016
 	access_time: Thu Jan 01 01:00:00 CET 1970
-	owner: hloader
+	owner: user
 	group: supergroup
 	permission: rwxr-xr-x
 
 Collecting block locations...
 Collected 269 locations.
 
-16/03/17 17:41:56 INFO Configuration.deprecation: dfs.data.dir is deprecated. Instead, use dfs.datanode.data.dir
 Data directories and disk ids
   DiskId: 0  Directory: FILE:/data01/hadoop/hdfs/data
   DiskId: 1  Directory: FILE:/data1/hadoop/hdfs/data
@@ -86,31 +85,31 @@ Data directories and disk ids
   DiskId: 47  Directory: FILE:/data8/hadoop/hdfs/data
   DiskId: 48  Directory: FILE:/data9/hadoop/hdfs/data
 
-16/03/17 17:41:57 WARN DistributedFileSystemMetadata: list of data nodes could not be got from API (requieres higher privilegies).
-16/03/17 17:41:57 WARN DistributedFileSystemMetadata: getting datanode list from configuration file (may contain data nodes which are not active).
+16/03/17 17:41:57 WARN DistributedFileSystemMetadata: list of data nodes could not be got from API (requires higher privileges).
+16/03/17 17:41:57 WARN DistributedFileSystemMetadata: getting data node list from configuration file (may contain data nodes which are not active).
 
  === Distribution along nodes and disks ===
 
 DiskId                   0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4
                          0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 Unknown   Count     Average
 Host
-itrac1508.cern.ch        0 = 0 = 0 = = = = 0 0 = 0 = 0 = = 0 = = + = = = + + = = = = = 0 = = + = = = = = 0 = = = = = = = = 0         77        1
-itrac1512.cern.ch        0 = + = = = 0 = = 0 0 = 0 = = = 0 = 0 = = = = 0 = = = 0 = 0 = 0 + = = = = = = = 0 + = = = = = = = 0         69        1
-lxfsrb53a07.cern.ch      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0         0         0
-lxfsrb53a04.cern.ch      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0         0         0
-p05153074365419.cern.ch  0 = = = = = 0 = = = 0 0 0 = 0 = = 0 0 = = 0 = 0 0 0 = 0 = 0 = 0 0 0 0 = 0 0 0 = 0 = = 0 0 = 0 = = 0         29        0
-itrac1502.cern.ch        0 = = 0 = 0 0 = 0 = 0 = 0 = 0 0 = = = 0 0 = 0 = = + + = = = = = = 0 0 = = = 0 0 0 0 = 0 = = 0 = 0 0         39        0
-itrac1501.cern.ch        0 = = = 0 = = = = 0 = = = = = 0 + + = = = = = = 0 = = = = = = = + = = = = 0 = = = = + = = = = = 0 0         106       2
-itrac1507.cern.ch        0 = = 0 = 0 0 = = 0 0 = 0 = = = = = 0 = = + = = + = = = = = = = 0 = 0 = = 0 = = 0 = = 0 + = = = = 0         66        1
-itrac1509.cern.ch        0 0 = 0 = = 0 = = 0 = = = 0 = 0 = 0 = = = = 0 0 = 0 = = = = = 0 0 = 0 = = 0 0 = 0 0 = 0 = 0 0 = 0 0         33        0
-lxfsrk39a01.cern.ch      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0         0         0
-itrac1504.cern.ch        0 0 = = = = = = = 0 = = 0 = = = = 0 = 0 = = = 0 = = = 0 = = = = = 0 0 = 0 = 0 = = = = 0 = = = = 0 0         56        1
-itrac1510.cern.ch        0 = 0 0 = 0 0 0 = = = 0 0 = = 0 = = = 0 = = = 0 = 0 0 = = = 0 0 0 0 0 0 = = 0 = = 0 = = = 0 + = = 0         37        0
-itrac1506.cern.ch        0 0 0 = 0 = 0 = = 0 0 0 = 0 = = = = = 0 = = = = 0 = = = = 0 = = = 0 = = = = 0 + = = + + + = = = 0 0         68        1
-p05153074600927.cern.ch  0 0 = 0 0 0 0 0 = 0 = 0 0 = = 0 = 0 = = = 0 = 0 = = = 0 = 0 0 0 0 0 0 0 = 0 0 = = 0 = 0 0 = = = 0 0         26        0
-itrac1503.cern.ch        0 = = = = = 0 0 0 = = 0 = = 0 0 = 0 + = = = = = = = = 0 = = = = = 0 0 = = = = = = = = 0 = = = = = 0         61        1
-itrac1511.cern.ch        0 = = = = = 0 = = = 0 0 = 0 = = 0 = = 0 0 = = 0 = + = = = = = 0 = = = = = = 0 + = = = = 0 = = = 0 0         64        1
-itrac1505.cern.ch        0 0 = = 0 0 + = = 0 0 = = 0 0 = 0 0 = = = 0 = 0 0 = = 0 = = = = 0 0 = = = 0 = = 0 = = 0 = + = = 0 0         42        0
+machine-1.cern.ch        0 = 0 = 0 = = = = 0 0 = 0 = 0 = = 0 = = + = = = + + = = = = = 0 = = + = = = = = 0 = = = = = = = = 0         77        1
+machine-2.cern.ch        0 = + = = = 0 = = 0 0 = 0 = = = 0 = 0 = = = = 0 = = = 0 = 0 = 0 + = = = = = = = 0 + = = = = = = = 0         69        1
+machine-3.cern.ch        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0         0         0
+machine-4.cern.ch        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0         0         0
+machine-5.cern.ch        0 = = = = = 0 = = = 0 0 0 = 0 = = 0 0 = = 0 = 0 0 0 = 0 = 0 = 0 0 0 0 = 0 0 0 = 0 = = 0 0 = 0 = = 0         29        0
+machine-6.cern.ch        0 = = 0 = 0 0 = 0 = 0 = 0 = 0 0 = = = 0 0 = 0 = = + + = = = = = = 0 0 = = = 0 0 0 0 = 0 = = 0 = 0 0         39        0
+machine-7.cern.ch        0 = = = 0 = = = = 0 = = = = = 0 + + = = = = = = 0 = = = = = = = + = = = = 0 = = = = + = = = = = 0 0         106       2
+machine-8.cern.ch        0 = = 0 = 0 0 = = 0 0 = 0 = = = = = 0 = = + = = + = = = = = = = 0 = 0 = = 0 = = 0 = = 0 + = = = = 0         66        1
+machine-9.cern.ch        0 0 = 0 = = 0 = = 0 = = = 0 = 0 = 0 = = = = 0 0 = 0 = = = = = 0 0 = 0 = = 0 0 = 0 0 = 0 = 0 0 = 0 0         33        0
+machine-10.cern.ch       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0         0         0
+machine-11.cern.ch       0 0 = = = = = = = 0 = = 0 = = = = 0 = 0 = = = 0 = = = 0 = = = = = 0 0 = 0 = 0 = = = = 0 = = = = 0 0         56        1
+machine-12.cern.ch       0 = 0 0 = 0 0 0 = = = 0 0 = = 0 = = = 0 = = = 0 = 0 0 = = = 0 0 0 0 0 0 = = 0 = = 0 = = = 0 + = = 0         37        0
+machine-13.cern.ch       0 0 0 = 0 = 0 = = 0 0 0 = 0 = = = = = 0 = = = = 0 = = = = 0 = = = 0 = = = = 0 + = = + + + = = = 0 0         68        1
+machine-14.cern.ch       0 0 = 0 0 0 0 0 = 0 = 0 0 = = 0 = 0 = = = 0 = 0 = = = 0 = 0 0 0 0 0 0 0 = 0 0 = = 0 = 0 0 = = = 0 0         26        0
+machine-15.cern.ch       0 = = = = = 0 0 0 = = 0 = = 0 0 = 0 + = = = = = = = = 0 = = = = = 0 0 = = = = = = = = 0 = = = = = 0         61        1
+machine-16.cern.ch       0 = = = = = 0 = = = 0 0 = 0 = = 0 = = 0 0 = = 0 = + = = = = = 0 = = = = = = 0 + = = = = 0 = = = 0 0         64        1
+machine-17.cern.ch       0 0 = = 0 0 + = = 0 0 = = 0 0 = 0 0 = = = 0 = 0 0 = = 0 = = = = 0 0 = = = 0 = = 0 = = 0 = + = = 0 0         42        0
 
 Leyend
   0: no blocks in this disk
@@ -126,20 +125,20 @@ Block (0) info:
 	No cached hosts
 	Hosts:
 		Replica (0):
-			Host: itrac1507.cern.ch
+			Host: machine-11.cern.ch
 			Location: FILE:/data30/hadoop/hdfs/data (DiskId: 24)
-			Name: 128.142.210.206:1004
-			TopologyPaths: /0513_R-0050/RL05/128.142.210.206:1004
+			Name: 12.12.20.26:1004
+			TopologyPaths: /0513_R-0050/RL05/12.12.20.26:1004
 		Replica (1):
-			Host: itrac1503.cern.ch
+			Host: machine-5.cern.ch
 			Location: FILE:/data2/hadoop/hdfs/data (DiskId: 12)
-			Name: 128.142.210.232:1004
-			TopologyPaths: /0513_R-0050/RL17/128.142.210.232:1004
+			Name: 12.2.10.32:1004
+			TopologyPaths: /0513_R-0050/RL17/12.2.10.32:1004
 		Replica (2):
-			Host: itrac1504.cern.ch
+			Host: machine-7.cern.ch
 			Location: FILE:/data34/hadoop/hdfs/data (DiskId: 28)
-			Name: 128.142.210.236:1004
-			TopologyPaths: /0513_R-0050/RL17/128.142.210.236:1004
+			Name: 12.12.21.2:1004
+			TopologyPaths: /0513_R-0050/RL17/12.12.21.2:1004
 
 Block (1) info:
 	Offset: 268435456
@@ -147,20 +146,20 @@ Block (1) info:
 	No cached hosts
 	Hosts:
 		Replica (0):
-			Host: itrac1507.cern.ch
+			Host: machine-2.cern.ch
 			Location: FILE:/data19/hadoop/hdfs/data (DiskId: 11)
-			Name: 128.142.210.206:1004
-			TopologyPaths: /0513_R-0050/RL05/128.142.210.206:1004
+			Name: 12.12.2.26:1004
+			TopologyPaths: /0513_R-0050/RL05/12.12.2.26:1004
 		Replica (1):
-			Host: itrac1509.cern.ch
+			Host: machine-8.cern.ch
 			Location: FILE:/data7/hadoop/hdfs/data (DiskId: 46)
-			Name: 128.142.210.237:1004
-			TopologyPaths: /0513_R-0050/RL21/128.142.210.237:1004
+			Name: 12.14.10.2:1004
+			TopologyPaths: /0513_R-0050/RL21/12.14.10.2:1004
 		Replica (2):
-			Host: itrac1512.cern.ch
+			Host: machine-16.cern.ch
 			Location: FILE:/data25/hadoop/hdfs/data (DiskId: 18)
-			Name: 128.142.210.235:1004
-			TopologyPaths: /0513_R-0050/RL21/128.142.210.235:1004
+			Name: 12.12.0.25:1004
+			TopologyPaths: /0513_R-0050/RL21/12.12.0.25:1004
 
 16/03/17 17:41:57 WARN DistributedFileSystemMetadata: Not showing more blocks because limit has been reached
 ```
