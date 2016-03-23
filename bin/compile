@@ -10,7 +10,8 @@
 # Environment variables for configuration
 # 
 # FORCE_JAVAC = true if you do not want to use Maven (default Maven is used)
-# JDK_BIN_PATH = path to java bin (default: /usr/bin/)
+# JDK_HOME = path to JDK home (default: binaries from PATH)
+# HADOOP_HOME = path to Hadoop home (default: binaries from PATH)
 
 # Reference: http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 SOURCE="${BASH_SOURCE[0]}"
@@ -27,14 +28,21 @@ if `command -v "mvn" &> /dev/null` && ! [ "$FORCE_JAVAC" == "true" ] ;
 then
 	mvn -f $HOME/pom.xml install
 else
-	: ${JDK_BIN_PATH:="/usr/bin/"}
-	
-	$JDK_BIN_PATH/javac \
-		-cp /usr/lib/hadoop-hdfs/lib/*:/usr/lib/hadoop/lib/*:/usr/lib/hadoop-hdfs/*:/usr/lib/hadoop/* \
-		$HOME/src/main/java/ch/cern/db/*.java
-	
-	mkdir -p $HOME/target
-	
-	$JDK_BIN_PATH/jar cf $HOME/target/hdfs-metadata.jar -C $HOME/src/main/java/ .
-fi
+	HADOOP_IN_PATH=$(PATH="${HADOOP_HOME:-${HADOOP_PREFIX}}/bin:$PATH" which hadoop 2>/dev/null)
+	HADOOP_CLASSPATH=$($HADOOP_IN_PATH classpath)
 
+	if [ -z "$JDK_HOME"  ]
+	then
+		JAVAC_BIN=javac
+		JAR_BIN=jar
+	else
+		JAVAC_BIN=$JDK_HOME/bin/javac
+		JAR_BIN=$JDK_HOME/bin/jar
+	fi
+
+	$JAVAC_BIN -cp $HADOOP_CLASSPATH $HOME/src/main/java/ch/cern/db/*.java
+
+	mkdir -p $HOME/target
+
+	$JAR_BIN cf $HOME/target/hdfs-metadata.jar -C $HOME/src/main/java/ .
+fi
