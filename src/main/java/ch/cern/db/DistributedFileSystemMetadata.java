@@ -41,6 +41,16 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 	private static final int MAX_NUMBER_OF_LOCATIONS = 20000;
 	
 	private static int limitPrintedBlocks = 20;
+	
+	public static final String ANSI_RESET = "\u001B[0m";
+	public static final String ANSI_BLACK = "\u001B[30m";
+	public static final String ANSI_RED = "\u001B[31m";
+	public static final String ANSI_GREEN = "\u001B[32m";
+	public static final String ANSI_YELLOW = "\u001B[33m";
+	public static final String ANSI_BLUE = "\u001B[34m";
+	public static final String ANSI_PURPLE = "\u001B[35m";
+	public static final String ANSI_CYAN = "\u001B[36m";
+	public static final String ANSI_WHITE = "\u001B[37m";
 
 	public DistributedFileSystemMetadata() throws IOException{
 		HdfsConfiguration conf = new HdfsConfiguration();
@@ -216,20 +226,20 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 				Integer count = diskIds_count.get(i);
 				
 				if(count == null)
-					System.out.print(adjustLength("0", 2));
+					System.out.print(color(ANSI_RED, adjustLength("0", 2)));
 				else if(count < low)
-					System.out.print(adjustLength("-", 2));
+					System.out.print(color(ANSI_YELLOW, adjustLength("-", 2)));
 				else if(count > high)
-					System.out.print(adjustLength("+", 2));
+					System.out.print(color(ANSI_YELLOW, adjustLength("+", 2)));
 				else
-					System.out.print(adjustLength("=", 2));
+					System.out.print(color(ANSI_GREEN, adjustLength("=", 2)));
 			}
 			
 			Integer count_unk = diskIds_count.get(-1);
 			if(count_unk == null)
-				System.out.print(adjustLength("0", 10));
+				System.out.print(color(ANSI_GREEN, adjustLength("0", 10)));
 			else
-				System.out.print(adjustLength(count_unk+"", 10));
+				System.out.print(color(ANSI_RED, adjustLength(count_unk+"", 10)));
 			
 			System.out.print(adjustLength(((int)sum)+"", 10));
 			
@@ -238,16 +248,30 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		
 		System.out.println();
 		System.out.println("Leyend");
-		System.out.println("  0: no blocks in this disk");
-		System.out.println("  +: #blocks is more than 20% of the avergae of blocks per disk of this host");
-		System.out.println("  =: #blocks is aproximatilly the avergae of blocks per disk of this host");
-		System.out.println("  +: #blocks is less than 20% of the avergae of blocks per disk of this host");
+		System.out.println("  " + color(ANSI_RED, "0") + ": no blocks in this disk");
+		System.out.println("  " + color(ANSI_YELLOW, "+") + ": #blocks is more than 20% of the avergae of blocks per disk of this host");
+		System.out.println("  " + color(ANSI_GREEN, "=") + ": #blocks is aproximatilly the avergae of blocks per disk of this host");
+		System.out.println("  " + color(ANSI_YELLOW, "-") + ": #blocks is less than 20% of the avergae of blocks per disk of this host");
+	}
+
+	private String color(String color, String string) {
+		if(string.contains("0")){
+			return color + string + ANSI_RESET;
+		}else if(string.contains("+")){
+			return color + string + ANSI_RESET;
+		}else if(string.contains("=")){
+			return color + string + ANSI_RESET;
+		}else if(string.contains("-")){
+			return color + string + ANSI_RESET;
+		}else{
+			return string;
+		}
 	}
 
 	private String[] getDataDirs() {
 		
 		//Proper way would be to get it from each node
-		//Cluster with same configuration this is fine
+		//For cluster with same configuration this method is fine
 		String dataDirsParam = getConf().get("dfs.data.dir");
 		if(dataDirsParam == null) 
 			dataDirsParam = getConf().get("dfs.datanode.data.dir");
