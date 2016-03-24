@@ -22,7 +22,7 @@ public class SUtilsTest {
 	}
 	
 	@Test
-	public void adjustLength() {
+	public void adjustLengthRightAlignment() {
 		String result = SUtils.adjustLength("Hi", 5);
 		Assert.assertEquals(5, result.length());
 		Assert.assertEquals("Hi   ", result);
@@ -66,6 +66,29 @@ public class SUtilsTest {
 		result = SUtils.adjustLength("Hi Hi Hi", 8);
 		Assert.assertEquals(8, result.length());
 		Assert.assertEquals("Hi Hi Hi", result);
+	}
+	
+	@Test
+	public void adjustLengthLeftAlignment() {
+		String result = SUtils.adjustLength("12", 5, '0', false);
+		Assert.assertEquals(5, result.length());
+		Assert.assertEquals("00012", result);
+
+		result = SUtils.adjustLength("12345", 4, '0', false);
+		Assert.assertEquals(4, result.length());
+		Assert.assertEquals("1...", result);
+		
+		result = SUtils.adjustLength("12345", 3, '0', false);
+		Assert.assertEquals(3, result.length());
+		Assert.assertEquals("1..", result);
+		
+		result = SUtils.adjustLength("12345", 2, '0', false);
+		Assert.assertEquals(2, result.length());
+		Assert.assertEquals("1.", result);
+		
+		result = SUtils.adjustLength("12345", 1, '0', false);
+		Assert.assertEquals(1, result.length());
+		Assert.assertEquals("1", result);
 	}
 	
 }

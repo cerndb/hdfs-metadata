@@ -117,7 +117,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 			
 			for (int i = 0; i < hosts.length; i++) {
 				String host = hosts[i];
-				Integer diskId = getDiskId(volumeIds[0]);
+				Integer diskId = getDiskId(volumeIds[i]);
 				
 				if(!hosts_diskIds.containsKey(host)){
 					HashMap<Integer, Integer> diskIds = new HashMap<>();
@@ -125,7 +125,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 					hosts_diskIds.put(host, diskIds);
 				}else{
 					HashMap<Integer, Integer> diskIds = hosts_diskIds.get(host);
-					Integer count = diskIds.get(diskId + 1);
+					Integer count = diskIds.get(diskId);
 					if(count != null){
 						diskIds.put(diskId, count + 1);
 					}else{

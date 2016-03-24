@@ -44,6 +44,10 @@ public class SUtils {
 	}
 	
 	public static String adjustLength(String inputString, int requiredLength) {
+		return adjustLength(inputString, requiredLength, ' ', true);
+	}
+	
+	public static String adjustLength(String inputString, int requiredLength, char fillChar, boolean rightAlign) {
 		if(requiredLength <= 0)
 			return "";
 		
@@ -56,8 +60,12 @@ public class SUtils {
 			return tmp;
 		}
 
-		while(inputString.length() < requiredLength)
-			inputString = inputString.concat(" ");
+		if(rightAlign)
+			while(inputString.length() < requiredLength)
+				inputString = inputString.concat(fillChar + "");
+		else
+			while(inputString.length() < requiredLength)
+				inputString = (fillChar + "").concat(inputString);
 		
 		return inputString;
 	}
