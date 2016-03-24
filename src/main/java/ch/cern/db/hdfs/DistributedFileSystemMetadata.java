@@ -6,7 +6,7 @@
  * granted to it by virtue of its status as Intergovernmental Organization
  * or submit itself to any jurisdiction.
  */
-package ch.cern.db;
+package ch.cern.db.hdfs;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,25 +32,15 @@ import org.apache.hadoop.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.cern.db.util.SUtils;
+import ch.cern.db.util.SUtils.Color;
+import ch.cern.db.util.Utils;
+
 public class DistributedFileSystemMetadata extends DistributedFileSystem{
 	
 	private static final Logger LOG = LoggerFactory.getLogger(DistributedFileSystemMetadata.class);
 	
-	public static final int SIZEOF_INT = Integer.SIZE / Byte.SIZE;
-	
 	private static final int MAX_NUMBER_OF_LOCATIONS = 20000;
-	
-	private static int limitPrintedBlocks = 20;
-	
-	public static final String ANSI_RESET = "\u001B[0m";
-	public static final String ANSI_BLACK = "\u001B[30m";
-	public static final String ANSI_RED = "\u001B[31m";
-	public static final String ANSI_GREEN = "\u001B[32m";
-	public static final String ANSI_YELLOW = "\u001B[33m";
-	public static final String ANSI_BLUE = "\u001B[34m";
-	public static final String ANSI_PURPLE = "\u001B[35m";
-	public static final String ANSI_CYAN = "\u001B[36m";
-	public static final String ANSI_WHITE = "\u001B[37m";
 
 	public DistributedFileSystemMetadata() throws IOException{
 		HdfsConfiguration conf = new HdfsConfiguration();
@@ -58,59 +48,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		initialize(getDefaultUri(conf), conf);
 	}
 
-	public static void main(String[] args) throws IOException {
-
-		if (args.length == 0 || args.length > 2) {
-			LOG.error("You need to specify a path as first argument. ");
-			System.exit(1);
-		}
-		if(args.length == 2){
-			limitPrintedBlocks = Integer.parseInt(args[1]);
-		}
-		
-		Path path = new Path(args[0]);
-		
-		@SuppressWarnings("resource")
-		DistributedFileSystemMetadata fsm = new DistributedFileSystemMetadata();
-		
-		fsm.printFileStatus(path);
-		
-		LinkedList<BlockLocation> blockLocations = fsm.getBlockLocations(path);
-		
-		String[] dataDirs = fsm.getDataDirs();
-		if(dataDirs != null){
-			System.out.println("Data directories and disk ids");
-			for (int i = 0; i < dataDirs.length; i++) {
-				System.out.println("  DiskId: " + i + "  Directory: " + dataDirs[i]);
-			}
-		}
-		System.out.println();
-		
-		if(fsm.getConf().getBoolean("dfs.datanode.hdfs-blocks-metadata.enabled", false)){
-			BlockStorageLocation[] blockStorageLocations = fsm.getFileBlockStorageLocations(blockLocations);
-			
-			HashMap<String, HashMap<Integer, Integer>> hosts_diskIds = 
-					fsm.calculateHostsDiskIdsCount(blockStorageLocations);
-			
-			String[] dataNodes = fsm.getDataNodes();
-			for (String name : dataNodes) {
-				if(!hosts_diskIds.containsKey(name))
-					hosts_diskIds.put(name, new HashMap<Integer, Integer>());
-			}
-			
-			fsm.printNodeDisksDistribution(hosts_diskIds, dataDirs);
-			
-			blockLocations.clear();
-			blockLocations.addAll(Arrays.asList(blockStorageLocations));
-		}else{
-			LOG.error("VolumnId/DiskId can not be collected since "
-					+ "dfs.datanode.hdfs-blocks-metadata.enabled is not enabled. So block distribution can not be shown.");
-		}
-		
-		fsm.printBlockMetadata(blockLocations, dataDirs);
-	}
-
-	private String[] getDataNodes() {
+	public String[] getDataNodes() {
 
 		try {
 			DatanodeInfo[] dataNodeStats = getDataNodeStats();
@@ -151,7 +89,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		return hostnames.toArray(new String[hostnames.size()]);
 	}
 
-	private void printBlockMetadata(LinkedList<BlockLocation> blockLocations, String[] dataDirs) 
+	public void printBlockMetadata(LinkedList<BlockLocation> blockLocations, String[] dataDirs, int limitPrintedBlocks) 
 			throws IOException {
 		
 		System.out.println();
@@ -177,7 +115,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		System.out.println();
 	}
 
-	private void printNodeDisksDistribution(HashMap<String, HashMap<Integer, Integer>> hosts_diskIds, String[] dataDirs) {
+	public void printNodeDisksDistribution(HashMap<String, HashMap<Integer, Integer>> hosts_diskIds, String[] dataDirs) {
 		System.out.println();
 		System.out.println(" === Distribution along nodes and disks ===");
 		System.out.println();
@@ -186,23 +124,23 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 			LOG.error("Cannot be calculated due to data directories configuration parameter are not available.");
 		}
 		
-		System.out.print(adjustLength("DiskId", 25));
+		System.out.print(SUtils.adjustLength("DiskId", 25));
 		if(dataDirs.length >= 10){
 			for (int i = 0; i < dataDirs.length; i++) {
-				System.out.print(adjustLength(Integer.toString(i / 10), 2));
+				System.out.print(SUtils.adjustLength(Integer.toString(i / 10), 2));
 			}
 			System.out.println();
-			System.out.print(adjustLength("", 25));
+			System.out.print(SUtils.adjustLength("", 25));
 		}
 		for (int i = 0; i < dataDirs.length; i++) {
-			System.out.print(adjustLength(Integer.toString(i % 10), 2));
+			System.out.print(SUtils.adjustLength(Integer.toString(i % 10), 2));
 		}
-		System.out.print(adjustLength("Unknown", 10));
-		System.out.print(adjustLength("Count", 10));
-		System.out.println(adjustLength("Average", 10));
+		System.out.print(SUtils.adjustLength("Unknown", 10));
+		System.out.print(SUtils.adjustLength("Count", 10));
+		System.out.println(SUtils.adjustLength("Average", 10));
 		System.out.println("Host");
 		for (Entry<String, HashMap<Integer, Integer>> host_diskIds : hosts_diskIds.entrySet()) {
-			System.out.print(adjustLength(host_diskIds.getKey(), 25));
+			System.out.print(SUtils.adjustLength(host_diskIds.getKey(), 25));
 			
 			HashMap<Integer, Integer> diskIds_count = host_diskIds.getValue();
 			
@@ -226,49 +164,34 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 				Integer count = diskIds_count.get(i);
 				
 				if(count == null)
-					System.out.print(color(ANSI_RED, adjustLength("0", 2)));
+					System.out.print(SUtils.color(Color.R, SUtils.adjustLength("0", 2)));
 				else if(count < low)
-					System.out.print(color(ANSI_YELLOW, adjustLength("-", 2)));
+					System.out.print(SUtils.color(Color.Y, SUtils.adjustLength("-", 2)));
 				else if(count > high)
-					System.out.print(color(ANSI_YELLOW, adjustLength("+", 2)));
+					System.out.print(SUtils.color(Color.Y, SUtils.adjustLength("+", 2)));
 				else
-					System.out.print(color(ANSI_GREEN, adjustLength("=", 2)));
+					System.out.print(SUtils.color(Color.G, SUtils.adjustLength("=", 2)));
 			}
 			
 			Integer count_unk = diskIds_count.get(-1);
 			if(count_unk == null)
-				System.out.print(color(ANSI_GREEN, adjustLength("0", 10)));
+				System.out.print(SUtils.color(Color.G, SUtils.adjustLength("0", 10)));
 			else
-				System.out.print(color(ANSI_RED, adjustLength(count_unk+"", 10)));
+				System.out.print(SUtils.color(Color.R, SUtils.adjustLength(count_unk+"", 10)));
 			
-			System.out.print(adjustLength(((int)sum)+"", 10));
-			
+			System.out.print(SUtils.adjustLength((int)sum+"", 10));
 			System.out.println((int) avg);
 		}
 		
 		System.out.println();
 		System.out.println("Leyend");
-		System.out.println("  " + color(ANSI_RED, "0") + ": no blocks in this disk");
-		System.out.println("  " + color(ANSI_YELLOW, "+") + ": #blocks is more than 20% of the avergae of blocks per disk of this host");
-		System.out.println("  " + color(ANSI_GREEN, "=") + ": #blocks is aproximatilly the avergae of blocks per disk of this host");
-		System.out.println("  " + color(ANSI_YELLOW, "-") + ": #blocks is less than 20% of the avergae of blocks per disk of this host");
+		System.out.println("  " + SUtils.color(Color.R,  "0") + ": no blocks in this disk");
+		System.out.println("  " + SUtils.color(Color.Y,  "+") + ": #blocks is more than 20% of the avergae of blocks per disk of this host");
+		System.out.println("  " + SUtils.color(Color.G, "=") + ": #blocks is aproximatilly the avergae of blocks per disk of this host");
+		System.out.println("  " + SUtils.color(Color.Y,  "-") + ": #blocks is less than 20% of the avergae of blocks per disk of this host");
 	}
 
-	private String color(String color, String string) {
-		if(string.contains("0")){
-			return color + string + ANSI_RESET;
-		}else if(string.contains("+")){
-			return color + string + ANSI_RESET;
-		}else if(string.contains("=")){
-			return color + string + ANSI_RESET;
-		}else if(string.contains("-")){
-			return color + string + ANSI_RESET;
-		}else{
-			return string;
-		}
-	}
-
-	private String[] getDataDirs() {
+	public String[] getDataDirs() {
 		
 		//Proper way would be to get it from each node
 		//For cluster with same configuration this method is fine
@@ -288,7 +211,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		return dataDirs;
 	}
 
-	private HashMap<String, HashMap<Integer, Integer>> calculateHostsDiskIdsCount(
+	public HashMap<String, HashMap<Integer, Integer>> calculateHostsDiskIdsCount(
 			BlockStorageLocation[] blockStorageLocations) throws IOException {
 		
 		HashMap<String, HashMap<Integer, Integer>> hosts_diskIds = new HashMap<>(); 
@@ -319,7 +242,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		return hosts_diskIds;
 	}
 
-	private void printFileStatus(Path path) throws IOException {
+	public void printFileStatus(Path path) throws IOException {
 		FileStatus status = getFileStatus(path);
 
 		System.out.println();
@@ -339,7 +262,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		System.out.println();
 	}
 
-	private LinkedList<BlockLocation> getBlockLocations(Path path) throws IOException {
+	public LinkedList<BlockLocation> getBlockLocations(Path path) throws IOException {
 		System.out.println("Collecting block locations...");
 		
 		LinkedList<BlockLocation> blockLocations = new LinkedList<BlockLocation>();
@@ -368,17 +291,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		return blockLocations;
 	}
 
-	private static String adjustLength(String string, int length) {
-		if(string.length() > length)
-			return string.substring(0, length - 3).concat("...");
-
-		while(string.length() < length)
-			string = string.concat(" ");
-		
-		return string;
-	}
-
-	private static void printBlockMetadata(BlockLocation blockStorageLocation, String[] dataDirs) 
+	public void printBlockMetadata(BlockLocation blockStorageLocation, String[] dataDirs) 
 			throws IOException {
 		
 		System.out.println("	Offset: " + blockStorageLocation.getOffset());
@@ -425,7 +338,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 	 * currently no public API to get at the volume id. We'll have to get it by
 	 * accessing the internals.
 	 */
-	private static int getDiskId(VolumeId hdfsVolumeId){
+	public int getDiskId(VolumeId hdfsVolumeId){
 		// Initialize the diskId as -1 to indicate it is unknown
 		int diskId = -1;
 
@@ -434,34 +347,13 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 
 			byte[] volumeIdBytes = StringUtils.hexStringToByte(volumeIdString);
 			if (volumeIdBytes != null && volumeIdBytes.length == 4) {
-				diskId = toInt(volumeIdBytes);
+				diskId = Utils.toInt(volumeIdBytes);
 			}else if (volumeIdBytes.length == 1) {
 				diskId = (int) volumeIdBytes[0];  // support hadoop-2.0.2
 	        }
 		}
 
 		return diskId;
-	}
-
-	/**
-	 * Converts a byte array to an int value
-	 * 
-	 * @param bytes
-	 *            byte array
-	 * @return the int value
-	 * @throws IllegalArgumentException
-	 *             if length is not {@link #SIZEOF_INT}
-	 */
-	public static int toInt(byte[] bytes) {
-		if (SIZEOF_INT > bytes.length)
-			throw new IllegalArgumentException("length is not SIZEOF_INT");
-		
-		int n = 0;
-		for (int i = 0; i < + bytes.length; i++) {
-			n <<= 8;
-			n ^= bytes[i] & 0xFF;
-		}
-		return n;
 	}
 
 }
