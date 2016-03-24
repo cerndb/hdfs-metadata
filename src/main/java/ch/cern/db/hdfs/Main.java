@@ -52,6 +52,7 @@ public class Main {
 		
 		String[] dataDirs = fsm.getDataDirs();
 		if(dataDirs != null){
+			System.out.println();
 			System.out.println("Data directories and disk ids");
 			for (int i = 0; i < dataDirs.length; i++) {
 				System.out.println("  DiskId: " + i + "  Directory: " + dataDirs[i]);

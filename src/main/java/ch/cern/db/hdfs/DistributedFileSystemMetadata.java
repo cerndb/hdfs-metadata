@@ -27,14 +27,14 @@ import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import ch.cern.db.util.Utils;
 
 public class DistributedFileSystemMetadata extends DistributedFileSystem{
 	
-	private static final Logger LOG = LoggerFactory.getLogger(DistributedFileSystemMetadata.class);
+	private static final Logger LOG = Logger.getLogger(DistributedFileSystemMetadata.class);
 	
 	private static final int MAX_NUMBER_OF_LOCATIONS = 20000;
 
@@ -97,7 +97,17 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 	 */
 	public String[] getDataDirs() {
 		
+		Logger logger = Logger.getLogger("org.apache.hadoop.conf.Configuration.deprecation");
+		
+		//Change logging level to avoid warnings about deprecated parameter
+		Level level = logger.getLevel();
+		logger.setLevel(Level.WARN);
+		
 		String dataDirsParam = getConf().get("dfs.data.dir");
+		
+		//Restore logging level
+		logger.setLevel(level);
+		
 		if(dataDirsParam == null) 
 			dataDirsParam = getConf().get("dfs.datanode.data.dir");
 		
