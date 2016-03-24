@@ -62,7 +62,10 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 			LOG.warn("getting datanode list from configuration file (may contain data nodes which are not active).");
 			return getDataNodesFromConf();
 		} catch (IOException e) {
+			LOG.warn(e.getMessage());
 		}
+		
+		LOG.warn("No list of data nodes found");
 		
 		return new String[0];
 	}
@@ -88,7 +91,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 	public String[] getDataDirs() {
 		
 		//Proper way would be to get it from each node
-		//For cluster with same configuration this method is fine
+		//For clusters with same configuration this method is fine
 		String dataDirsParam = getConf().get("dfs.data.dir");
 		if(dataDirsParam == null) 
 			dataDirsParam = getConf().get("dfs.datanode.data.dir");
@@ -96,8 +99,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		String[] dataDirs = null;
 		
 		if(dataDirsParam == null){
-			LOG.warn("dfs.data.dir or dfs.datanode.data.dir "
-					+ "cofiguration parameter is not set, so block distribution can not be shown.");
+			LOG.warn("dfs.data.dir or dfs.datanode.data.dir cofiguration parameter is not set");
 		}else{
 			dataDirs = dataDirsParam.split(",");
 		}

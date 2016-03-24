@@ -144,7 +144,7 @@ public class Main {
 		System.out.println();
 		
 		if(dataDirs == null){
-			LOG.error("Cannot be computed due to data directories configuration parameter are not available.");
+			LOG.error("Cannot be computed due to data directories are not available.");
 			return;
 		}
 		
