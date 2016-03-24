@@ -40,7 +40,9 @@ else
 		JAR_BIN=$JDK_HOME/bin/jar
 	fi
 
-	$JAVAC_BIN -cp $HADOOP_CLASSPATH $HOME/src/main/java/ch/cern/db/*.java
+	$JAVAC_BIN -cp $HADOOP_CLASSPATH \
+		$HOME/src/main/java/ch/cern/db/hdfs/*.java \
+		$HOME/src/main/java/ch/cern/db/util/*.java
 
 	mkdir -p $HOME/target
 

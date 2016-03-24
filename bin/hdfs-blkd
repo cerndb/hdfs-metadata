@@ -33,4 +33,4 @@ else
 	JAVA_BIN=$JDK_HOME/bin/java
 fi
 	
-$JAVA_BIN -cp $HOME/target/*:$HADOOP_CLASSPATH ch.cern.db.DistributedFileSystemMetadata "$@"
+$JAVA_BIN -cp $HOME/target/*:$HADOOP_CLASSPATH ch.cern.db.hdfs.Main "$@"
