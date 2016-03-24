@@ -24,7 +24,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 
 		if (args.length == 0 || args.length > 2) {
-			LOG.error("You need to specify a path as first argument.");
+			System.err.println("You need to specify a path as first argument.");
 			System.exit(1);
 		}
 		
