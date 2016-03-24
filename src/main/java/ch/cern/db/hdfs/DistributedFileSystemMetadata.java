@@ -88,10 +88,15 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		return hostnames.toArray(new String[hostnames.size()]);
 	}
 
+	/**
+	 * For clusters with same configuration this method is fine.
+	 * 
+	 * It gets the list of data directories from local host
+	 * 
+	 * @return Array of HDFS data directories
+	 */
 	public String[] getDataDirs() {
 		
-		//Proper way would be to get it from each node
-		//For clusters with same configuration this method is fine
 		String dataDirsParam = getConf().get("dfs.data.dir");
 		if(dataDirsParam == null) 
 			dataDirsParam = getConf().get("dfs.datanode.data.dir");
