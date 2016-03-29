@@ -114,7 +114,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		String[] dataDirs = null;
 		
 		if(dataDirsParam == null){
-			LOG.warn("dfs.data.dir or dfs.datanode.data.dir cofiguration parameter is not set");
+			LOG.warn("dfs.data.dir or dfs.datanode.data.dir cofiguration parameter is not set, so data directories and number of disk are unknown");
 		}else{
 			dataDirs = dataDirsParam.split(",");
 		}

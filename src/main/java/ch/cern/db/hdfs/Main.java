@@ -71,7 +71,7 @@ public class Main {
 				if(!hosts_diskIds.containsKey(name))
 					hosts_diskIds.put(name, new HashMap<Integer, Integer>());
 				
-			printNodeDisksDistribution(hosts_diskIds, dataDirs);
+			printNodeDisksDistribution(hosts_diskIds, dataDirs != null ? dataDirs.length : -1);
 		}else{
 			LOG.warn("Not showing block distribution due to DiskIds are not available.");
 		}
@@ -145,27 +145,24 @@ public class Main {
 		}
 	}
 
-	private static void printNodeDisksDistribution(HashMap<String, HashMap<Integer, Integer>> hosts_diskIds,
-			String[] dataDirs) {
+	static void printNodeDisksDistribution(HashMap<String, HashMap<Integer, Integer>> hosts_diskIds,
+			Integer numDisks) {
 		
 		System.out.println();
 		System.out.println(" === Distribution along nodes and disks ===");
 		System.out.println();
 		
-		if(dataDirs == null){
-			LOG.error("Cannot be computed due to data directories are not available.");
-			return;
-		}
+		numDisks = Math.max(getMaxDiskId(hosts_diskIds) + 1, numDisks);
 		
 		System.out.print(SUtils.adjustLength("DiskId", 25));
-		if(dataDirs.length >= 10){
-			for (int i = 0; i < dataDirs.length; i++) {
+		if(numDisks >= 10){
+			for (int i = 0; i < numDisks; i++) {
 				System.out.print(SUtils.adjustLength(Integer.toString(i / 10), 2));
 			}
 			System.out.println();
 			System.out.print(SUtils.adjustLength("", 25));
 		}
-		for (int i = 0; i < dataDirs.length; i++) {
+		for (int i = 0; i < numDisks; i++) {
 			System.out.print(SUtils.adjustLength(Integer.toString(i % 10), 2));
 		}
 		System.out.print(SUtils.adjustLength("Unknown", 10));
@@ -178,13 +175,13 @@ public class Main {
 			HashMap<Integer, Integer> diskIds_count = host_diskIds.getValue();
 			
 			float sum = 0;
-			for (int i = 0; i < dataDirs.length; i++){
+			for (int i = 0; i < numDisks; i++){
 				Integer count = diskIds_count.get(i);
 				
 				if(count != null)
 					sum += diskIds_count.get(i);
 			}
-			float avg = sum / dataDirs.length;
+			float avg = sum / numDisks;
 			
 			float low = (float) (avg - 0.2 * avg);
 			if(avg - low < 2)
@@ -193,7 +190,7 @@ public class Main {
 			if(high - avg < 2)
 				high = avg + 2;
 			
-			for (int i = 0; i < dataDirs.length; i++) {
+			for (int i = 0; i < numDisks; i++) {
 				Integer count = diskIds_count.get(i);
 				
 				if(count == null)
@@ -222,6 +219,18 @@ public class Main {
 		System.out.println("  " + SUtils.color(Color.Y,  "+") + ": #blocks is more than 20% of the avergae of blocks per disk of this host");
 		System.out.println("  " + SUtils.color(Color.G, "=") + ": #blocks is aproximatilly the avergae of blocks per disk of this host");
 		System.out.println("  " + SUtils.color(Color.Y,  "-") + ": #blocks is less than 20% of the avergae of blocks per disk of this host");
+	}
+
+	private static int getMaxDiskId(HashMap<String, HashMap<Integer, Integer>> hosts_diskIds) {
+		
+		Integer maxDiskId = -1;
+		
+		for (HashMap<Integer, Integer> host_diskIds : hosts_diskIds.values())
+			for (Integer diskId : host_diskIds.keySet())
+				if(diskId > maxDiskId)
+					maxDiskId = diskId;
+		
+		return maxDiskId;
 	}
 
 	private static void printFileStatus(FileStatus status) {
