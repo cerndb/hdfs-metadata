@@ -6,7 +6,7 @@ Build project:
 bin/compile
 ```
 
-Usage:
+Usage ([Hadoop generic options](https://hadoop.apache.org/docs/r2.6.4/hadoop-project-dist/hadoop-common/CommandsManual.html#Generic_Options) can be passed):
 
 ``` 
 bin/hdfs-blkd <path> [<max_number_of_blocks_to_print>]
