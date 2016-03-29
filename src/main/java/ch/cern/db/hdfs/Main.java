@@ -233,8 +233,6 @@ public class Main extends Configured implements Tool {
 		
 		printFileStatus(fsm.getFileStatus(path));
 		
-		List<BlockLocation> blockLocations = fsm.getBlockLocations(path);
-		
 		String[] dataDirs = fsm.getDataDirs();
 		if(dataDirs != null){
 			System.out.println();
@@ -244,6 +242,8 @@ public class Main extends Configured implements Tool {
 			}
 		}
 		System.out.println();
+		
+		List<BlockLocation> blockLocations = fsm.getBlockLocations(path);
 		
 		HashMap<String, HashMap<Integer, Integer>> hosts_diskIds = 
 				DistributedFileSystemMetadata.computeHostsDiskIdsCount(blockLocations);
