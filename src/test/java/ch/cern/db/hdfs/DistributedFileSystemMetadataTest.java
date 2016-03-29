@@ -46,7 +46,7 @@ public class DistributedFileSystemMetadataTest extends DistributedFileSystem{
 
 	@Test
 	public void computeHostsDiskIdsCount() throws IOException{
-		List<BlockStorageLocation> blockStorageLocations = new LinkedList<>();
+		List<BlockLocation> blockStorageLocations = new LinkedList<>();
 		blockStorageLocations.add(new BlockStorageLocation(
 				new BlockLocation(null, new String[]{"host1", "host2"}, 0, 0), 
 				new VolumeId[]{new TVolumeId("3"), new TVolumeId("4")}));
@@ -59,15 +59,18 @@ public class DistributedFileSystemMetadataTest extends DistributedFileSystem{
 		blockStorageLocations.add(new BlockStorageLocation(
 				new BlockLocation(null, new String[]{"host10", "host3"}, 0, 0), 
 				new VolumeId[]{new TVolumeId("8"), new TVolumeId("5")}));
-		
+		blockStorageLocations.add(new BlockLocation(null, new String[]{"host10", "host3", "host3"}, 0, 0));
+				
 		HashMap<String, HashMap<Integer, Integer>> hosts_diskids = 
 				DistributedFileSystemMetadata.computeHostsDiskIdsCount(blockStorageLocations);
 		
 		Assert.assertEquals(1, hosts_diskids.get("host1").get(3).intValue());
 		Assert.assertEquals(3, hosts_diskids.get("host2").get(4).intValue());
 		Assert.assertEquals(2, hosts_diskids.get("host3").get(5).intValue());
+		Assert.assertEquals(2, hosts_diskids.get("host3").get(-1).intValue());
 		Assert.assertEquals(1, hosts_diskids.get("host10").get(3).intValue());
 		Assert.assertEquals(1, hosts_diskids.get("host10").get(8).intValue());
+		Assert.assertEquals(1, hosts_diskids.get("host10").get(-1).intValue());
 	}
 
 	@Test

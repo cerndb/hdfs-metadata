@@ -245,9 +245,8 @@ public class Main extends Configured implements Tool {
 		}
 		System.out.println();
 		
-		@SuppressWarnings("unchecked")
 		HashMap<String, HashMap<Integer, Integer>> hosts_diskIds = 
-				DistributedFileSystemMetadata.computeHostsDiskIdsCount((List<BlockStorageLocation>)(List<?>) blockLocations);
+				DistributedFileSystemMetadata.computeHostsDiskIdsCount(blockLocations);
 			
 		//Fill with not existing data nodes
 		String[] dataNodes = fsm.getDataNodes();

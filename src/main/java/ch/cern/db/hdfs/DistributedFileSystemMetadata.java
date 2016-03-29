@@ -121,16 +121,19 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 	}
 
 	public static HashMap<String, HashMap<Integer, Integer>> computeHostsDiskIdsCount(
-			List<BlockStorageLocation> blockStorageLocations) throws IOException {
+			List<BlockLocation> blockLocations) throws IOException {
 		
 		HashMap<String, HashMap<Integer, Integer>> hosts_diskIds = new HashMap<>(); 
-		for (BlockStorageLocation blockStorageLocation : blockStorageLocations) {
-			String[] hosts = blockStorageLocation.getHosts();
-			VolumeId[] volumeIds = blockStorageLocation.getVolumeIds();
+		for (BlockLocation blockLocation : blockLocations) {
+			String[] hosts = blockLocation.getHosts();
+			
+			VolumeId[] volumeIds = null;
+			if(blockLocation instanceof BlockStorageLocation)
+				volumeIds = ((BlockStorageLocation) blockLocation).getVolumeIds();
 			
 			for (int i = 0; i < hosts.length; i++) {
 				String host = hosts[i];
-				Integer diskId = getDiskId(volumeIds[i]);
+				Integer diskId = getDiskId(volumeIds != null ? volumeIds[i] : null);
 				
 				if(!hosts_diskIds.containsKey(host)){
 					HashMap<Integer, Integer> diskIds = new HashMap<>();
