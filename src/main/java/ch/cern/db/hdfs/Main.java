@@ -14,70 +14,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.BlockStorageLocation;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.VolumeId;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.cern.db.util.SUtils;
 import ch.cern.db.util.SUtils.Color;
 
-public class Main {
+public class Main extends Configured implements Tool {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-
-	public static void main(String[] args) throws IOException {
-
-		if (args.length == 0 || args.length > 2) {
-			System.err.println("You need to specify a path as first argument.");
-			System.exit(1);
-		}
-		
-		int limitPrintedBlocks = 20;
-		if(args.length == 2){
-			limitPrintedBlocks = Integer.parseInt(args[1]);
-		}
-		
-		Path path = new Path(args[0]);
-		
-		@SuppressWarnings("resource")
-		DistributedFileSystemMetadata fsm = new DistributedFileSystemMetadata();
-		
-		printFileStatus(fsm.getFileStatus(path));
-		
-		List<BlockLocation> blockLocations = fsm.getBlockLocations(path);
-		
-		String[] dataDirs = fsm.getDataDirs();
-		if(dataDirs != null){
-			System.out.println();
-			System.out.println("Data directories and disk ids");
-			for (int i = 0; i < dataDirs.length; i++) {
-				System.out.println("  DiskId: " + i + "  Directory: " + dataDirs[i]);
-			}
-		}
-		System.out.println();
-		
-		if(fsm.isHdfsBlocksBetadataEnabled()){
-			@SuppressWarnings("unchecked")
-			HashMap<String, HashMap<Integer, Integer>> hosts_diskIds = 
-					DistributedFileSystemMetadata.computeHostsDiskIdsCount((List<BlockStorageLocation>)(List<?>) blockLocations);
-				
-			//Fill with not existing data nodes
-			String[] dataNodes = fsm.getDataNodes();
-			for (String name : dataNodes)
-				if(!hosts_diskIds.containsKey(name))
-					hosts_diskIds.put(name, new HashMap<Integer, Integer>());
-				
-			printNodeDisksDistribution(hosts_diskIds, dataDirs != null ? dataDirs.length : -1);
-		}else{
-			LOG.warn("Not showing block distribution due to DiskIds are not available.");
-		}
-			
-		printBlockMetadata(blockLocations, dataDirs, limitPrintedBlocks);
-	}
 
 	private static void printBlockMetadata(List<BlockLocation> blockLocations, String[] dataDirs,
 			int limitPrintedBlocks) throws IOException {
@@ -254,5 +208,62 @@ public class Main {
 		System.out.println();
 	}
 
+	public static void main(String[] args) throws Exception {
+		int res = ToolRunner.run(new Configuration(), new Main(), args);
+        System.exit(res);
+	}
+	
+	@Override
+	public int run(String[] args) throws Exception {
+
+		if (args.length == 0 || args.length > 2) {
+			System.err.println("You need to specify a path as first argument.");
+			System.exit(1);
+		}
+		
+		int limitPrintedBlocks = 20;
+		if(args.length == 2){
+			limitPrintedBlocks = Integer.parseInt(args[1]);
+		}
+		
+		Path path = new Path(args[0]);
+		
+		@SuppressWarnings("resource")
+		DistributedFileSystemMetadata fsm = new DistributedFileSystemMetadata();
+		
+		printFileStatus(fsm.getFileStatus(path));
+		
+		List<BlockLocation> blockLocations = fsm.getBlockLocations(path);
+		
+		String[] dataDirs = fsm.getDataDirs();
+		if(dataDirs != null){
+			System.out.println();
+			System.out.println("Data directories and disk ids");
+			for (int i = 0; i < dataDirs.length; i++) {
+				System.out.println("  DiskId: " + i + "  Directory: " + dataDirs[i]);
+			}
+		}
+		System.out.println();
+		
+		if(fsm.isHdfsBlocksBetadataEnabled()){
+			@SuppressWarnings("unchecked")
+			HashMap<String, HashMap<Integer, Integer>> hosts_diskIds = 
+					DistributedFileSystemMetadata.computeHostsDiskIdsCount((List<BlockStorageLocation>)(List<?>) blockLocations);
+				
+			//Fill with not existing data nodes
+			String[] dataNodes = fsm.getDataNodes();
+			for (String name : dataNodes)
+				if(!hosts_diskIds.containsKey(name))
+					hosts_diskIds.put(name, new HashMap<Integer, Integer>());
+				
+			printNodeDisksDistribution(hosts_diskIds, dataDirs != null ? dataDirs.length : -1);
+		}else{
+			LOG.warn("Not showing block distribution due to DiskIds are not available.");
+		}
+			
+		printBlockMetadata(blockLocations, dataDirs, limitPrintedBlocks);
+	
+		return 0;
+	}
 
 }
