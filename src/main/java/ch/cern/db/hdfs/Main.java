@@ -229,7 +229,7 @@ public class Main extends Configured implements Tool {
 		Path path = new Path(args[0]);
 		
 		@SuppressWarnings("resource")
-		DistributedFileSystemMetadata fsm = new DistributedFileSystemMetadata();
+		DistributedFileSystemMetadata fsm = new DistributedFileSystemMetadata(getConf());
 		
 		printFileStatus(fsm.getFileStatus(path));
 		
@@ -245,7 +245,7 @@ public class Main extends Configured implements Tool {
 		}
 		System.out.println();
 		
-		if(fsm.isHdfsBlocksBetadataEnabled()){
+		if(fsm.isHdfsBlocksMetadataEnabled()){
 			@SuppressWarnings("unchecked")
 			HashMap<String, HashMap<Integer, Integer>> hosts_diskIds = 
 					DistributedFileSystemMetadata.computeHostsDiskIdsCount((List<BlockStorageLocation>)(List<?>) blockLocations);

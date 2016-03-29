@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.BlockStorageLocation;
 import org.apache.hadoop.fs.LocatedFileStatus;
@@ -24,7 +25,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.fs.VolumeId;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.log4j.Level;
@@ -38,9 +38,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 	
 	private static final int MAX_NUMBER_OF_LOCATIONS = 20000;
 
-	public DistributedFileSystemMetadata() throws IOException{
-		HdfsConfiguration conf = new HdfsConfiguration();
-		
+	public DistributedFileSystemMetadata(Configuration conf) throws IOException{
 		initialize(getDefaultUri(conf), conf);
 	}
 
@@ -178,7 +176,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		}
 		LOG.info("Collected " + blockLocations.size() + " locations.");
 		
-		if(isHdfsBlocksBetadataEnabled()){
+		if(isHdfsBlocksMetadataEnabled()){
 			BlockStorageLocation[] blockStorageLocations = getFileBlockStorageLocations(blockLocations);
 			
 			blockLocations.clear();
@@ -191,7 +189,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		return blockLocations;
 	}
 
-	public boolean isHdfsBlocksBetadataEnabled() {
+	public boolean isHdfsBlocksMetadataEnabled() {
 		return getConf().getBoolean("dfs.datanode.hdfs-blocks-metadata.enabled", false);
 	}
 
