@@ -209,6 +209,9 @@ public class Main {
 			else
 				System.out.print(SUtils.color(Color.R, SUtils.adjustLength(count_unk+"", 10)));
 			
+			if(diskIds_count.containsKey(-1))
+				sum += diskIds_count.get(-1);
+			
 			System.out.print(SUtils.adjustLength((int)sum+"", 10));
 			System.out.println((int) avg);
 		}
