@@ -245,21 +245,17 @@ public class Main extends Configured implements Tool {
 		}
 		System.out.println();
 		
-		if(fsm.isHdfsBlocksMetadataEnabled()){
-			@SuppressWarnings("unchecked")
-			HashMap<String, HashMap<Integer, Integer>> hosts_diskIds = 
-					DistributedFileSystemMetadata.computeHostsDiskIdsCount((List<BlockStorageLocation>)(List<?>) blockLocations);
-				
-			//Fill with not existing data nodes
-			String[] dataNodes = fsm.getDataNodes();
-			for (String name : dataNodes)
-				if(!hosts_diskIds.containsKey(name))
-					hosts_diskIds.put(name, new HashMap<Integer, Integer>());
-				
-			printNodeDisksDistribution(hosts_diskIds, dataDirs != null ? dataDirs.length : -1);
-		}else{
-			LOG.warn("Not showing block distribution due to DiskIds are not available.");
-		}
+		@SuppressWarnings("unchecked")
+		HashMap<String, HashMap<Integer, Integer>> hosts_diskIds = 
+				DistributedFileSystemMetadata.computeHostsDiskIdsCount((List<BlockStorageLocation>)(List<?>) blockLocations);
+			
+		//Fill with not existing data nodes
+		String[] dataNodes = fsm.getDataNodes();
+		for (String name : dataNodes)
+			if(!hosts_diskIds.containsKey(name))
+				hosts_diskIds.put(name, new HashMap<Integer, Integer>());
+			
+		printNodeDisksDistribution(hosts_diskIds, dataDirs != null ? dataDirs.length : -1);
 			
 		printBlockMetadata(blockLocations, dataDirs, limitPrintedBlocks);
 	
