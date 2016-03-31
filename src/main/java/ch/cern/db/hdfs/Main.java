@@ -105,23 +105,23 @@ public class Main extends Configured implements Tool {
 	}
 
 	static void printNodeDisksDistribution(HashMap<String, HashMap<Integer, Integer>> hosts_diskIds,
-			Integer numDisks) {
+			Integer maxNumDisks, HashMap<String, Integer> disksPerHost) {
 		
 		System.out.println();
 		System.out.println(" === Distribution along nodes and disks ===");
 		System.out.println();
 		
-		numDisks = Math.max(getMaxDiskId(hosts_diskIds) + 1, numDisks);
+		maxNumDisks = Math.max(getMaxDiskId(disksPerHost, hosts_diskIds) + 1, maxNumDisks);
 		
 		System.out.print(SUtils.adjustLength("DiskId", 25));
-		if(numDisks >= 10){
-			for (int i = 0; i < numDisks; i++) {
+		if(maxNumDisks >= 10){
+			for (int i = 0; i < maxNumDisks; i++) {
 				System.out.print(SUtils.adjustLength(Integer.toString(i / 10), 2));
 			}
 			System.out.println();
 			System.out.print(SUtils.adjustLength("", 25));
 		}
-		for (int i = 0; i < numDisks; i++) {
+		for (int i = 0; i < maxNumDisks; i++) {
 			System.out.print(SUtils.adjustLength(Integer.toString(i % 10), 2));
 		}
 		System.out.print(SUtils.adjustLength("Unknown", 10));
@@ -134,13 +134,18 @@ public class Main extends Configured implements Tool {
 			HashMap<Integer, Integer> diskIds_count = host_diskIds.getValue();
 			
 			float sum = 0;
+			int disksWithBlocksCount = 0;
+			int numDisks = disksPerHost.containsKey(host_diskIds.getKey()) ?
+					disksPerHost.get(host_diskIds.getKey()) : maxNumDisks;
 			for (int i = 0; i < numDisks; i++){
 				Integer count = diskIds_count.get(i);
 				
-				if(count != null)
+				if(count != null){
 					sum += diskIds_count.get(i);
+					disksWithBlocksCount++;
+				}
 			}
-			float avg = sum / numDisks;
+			float avg = sum / disksWithBlocksCount;
 			
 			float low = (float) (avg - 0.2 * avg);
 			if(avg - low < 2)
@@ -149,7 +154,8 @@ public class Main extends Configured implements Tool {
 			if(high - avg < 2)
 				high = avg + 2;
 			
-			for (int i = 0; i < numDisks; i++) {
+			int i;
+			for (i = 0; i < numDisks; i++) {
 				Integer count = diskIds_count.get(i);
 				
 				if(count == null)
@@ -160,6 +166,9 @@ public class Main extends Configured implements Tool {
 					System.out.print(SUtils.color(Color.Y, SUtils.adjustLength("+", 2)));
 				else
 					System.out.print(SUtils.color(Color.G, SUtils.adjustLength("=", 2)));
+			}
+			for (; i < maxNumDisks; i++) {
+				System.out.print(SUtils.adjustLength("", 2));
 			}
 			
 			Integer count_unk = diskIds_count.get(-1);
@@ -183,9 +192,13 @@ public class Main extends Configured implements Tool {
 		System.out.println("  " + SUtils.color(Color.Y,  "-") + ": #blocks is less than 20% of the avergae of blocks per disk of this host");
 	}
 
-	private static int getMaxDiskId(HashMap<String, HashMap<Integer, Integer>> hosts_diskIds) {
+	private static int getMaxDiskId(HashMap<String, Integer> disksPerHost, HashMap<String, HashMap<Integer, Integer>> hosts_diskIds) {
 		
 		Integer maxDiskId = -1;
+		
+		for (Integer count : disksPerHost.values())
+			if(count - 1 > maxDiskId)
+				maxDiskId = count - 1;
 		
 		for (HashMap<Integer, Integer> host_diskIds : hosts_diskIds.values())
 			for (Integer diskId : host_diskIds.keySet())
@@ -258,8 +271,10 @@ public class Main extends Configured implements Tool {
 		for (String name : dataNodes)
 			if(!hosts_diskIds.containsKey(name))
 				hosts_diskIds.put(name, new HashMap<Integer, Integer>());
-			
-		printNodeDisksDistribution(hosts_diskIds, dataDirs != null ? dataDirs.length : -1);
+		
+		HashMap<String, Integer> disksPerHost = fsm.getNumberOfDataDirsPerHost(); 
+				
+		printNodeDisksDistribution(hosts_diskIds, dataDirs != null ? dataDirs.length : -1, disksPerHost);
 			
 		printBlockMetadata(blockLocations, dataDirs, limitPrintedBlocks);
 	

@@ -25,8 +25,12 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.fs.VolumeId;
+import org.apache.hadoop.hdfs.DFSClient;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
+import org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType;
+import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.hdfs.server.protocol.DatanodeStorageReport;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -119,6 +123,28 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		}
 		
 		return dataDirs;
+	}
+	
+	public HashMap<String, Integer> getNumberOfDataDirsPerHost(){
+		HashMap<String, Integer> disksPerHost = new HashMap<>();
+		
+		try {
+			@SuppressWarnings("resource")
+			DFSClient dfsClient = new DFSClient(NameNode.getAddress(getConf()), getConf());
+			
+			DatanodeStorageReport[] datanodeStorageReports = dfsClient.getDatanodeStorageReport(DatanodeReportType.ALL);
+			
+			for (DatanodeStorageReport datanodeStorageReport : datanodeStorageReports) {
+				disksPerHost.put(
+						datanodeStorageReport.getDatanodeInfo().getHostName(),
+						datanodeStorageReport.getStorageReports().length);
+				
+			}
+		} catch (IOException e) {
+			LOG.warn("Number of data directories per node could not be collected (requieres higher privilegies).");
+		}
+		
+		return disksPerHost;
 	}
 
 	public static HashMap<String, HashMap<Integer, Integer>> computeHostsDiskIdsCount(
