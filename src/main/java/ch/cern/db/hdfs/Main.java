@@ -39,6 +39,11 @@ public class Main extends Configured implements Tool {
 		System.out.println(" === Metadata of blocks and replicass ===");
 		System.out.println();
 		
+		if(limitPrintedBlocks < 1){
+			LOG.warn("Not showing blocks because limit has been configured to 0");
+			return;
+		}
+		
 		int j = 0;
 		for (BlockLocation blockLocation : blockLocations) {
 			System.out.println("Block (" + j + ") info:");

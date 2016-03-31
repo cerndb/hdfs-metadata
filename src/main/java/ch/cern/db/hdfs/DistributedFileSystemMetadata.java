@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.BlockStorageLocation;
@@ -159,7 +160,13 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		
 		LinkedList<BlockLocation> blockLocations = new LinkedList<BlockLocation>();
 		RemoteIterator<LocatedFileStatus> statuses = listFiles(path, true);
-		while(statuses.hasNext()){
+		int hasNextCode = hasNextCode(statuses);
+		while(hasNextCode > 0){
+			if(hasNextCode > 1){
+				hasNextCode = hasNextCode(statuses);
+				continue;
+			}
+			
 			LocatedFileStatus fileStatus = statuses.next();
 			
 			if(fileStatus.isFile()){
@@ -176,6 +183,8 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 				LOG.info("Reached max number of locations to collect. The amount will be representative enough.");
 				break;
 			}
+			
+			hasNextCode = hasNextCode(statuses);
 		}
 		LOG.info("Collected " + blockLocations.size() + " locations.");
 		
@@ -190,6 +199,21 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 		}
 		
 		return blockLocations;
+	}
+
+	private int hasNextCode(RemoteIterator<LocatedFileStatus> statuses) throws IOException {
+		try {
+			if(statuses.hasNext())
+				return 1;
+			else
+				return 0;
+		} catch (AccessControlException e) {
+			String message = e.getMessage();
+
+			LOG.warn("Skipped file or directory because: " + message.substring(0, message.indexOf("\n")));
+			
+			return 2;
+		}
 	}
 
 	public boolean isHdfsBlocksMetadataEnabled() {
