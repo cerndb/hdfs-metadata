@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.BlockStorageLocation;
@@ -31,8 +30,8 @@ import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeStorageReport;
+import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.util.StringUtils;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import ch.cern.db.util.Utils;
@@ -99,30 +98,15 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 	 * @return Array of HDFS data directories
 	 */
 	public String[] getDataDirs() {
-		
-		Logger logger = Logger.getLogger("org.apache.hadoop.conf.Configuration.deprecation");
-		
-		//Change logging level to avoid warnings about deprecated parameter
-		Level level = logger.getLevel();
-		logger.setLevel(Level.WARN);
-		
-		String dataDirsParam = getConf().get("dfs.data.dir");
-		
-		//Restore logging level
-		logger.setLevel(level);
-		
-		if(dataDirsParam == null) 
-			dataDirsParam = getConf().get("dfs.datanode.data.dir");
-		
-		String[] dataDirs = null;
+		String dataDirsParam = getConf().get("dfs.datanode.data.dir");
 		
 		if(dataDirsParam == null){
 			LOG.warn("dfs.data.dir or dfs.datanode.data.dir cofiguration parameter is not set, so data directories and number of disk are unknown");
+			
+			return null;
 		}else{
-			dataDirs = dataDirsParam.split(",");
+			return dataDirsParam.split(",");
 		}
-		
-		return dataDirs;
 	}
 	
 	public HashMap<String, Integer> getNumberOfDataDirsPerHost(){
@@ -141,7 +125,7 @@ public class DistributedFileSystemMetadata extends DistributedFileSystem{
 				
 			}
 		} catch (IOException e) {
-			LOG.warn("Number of data directories per node could not be collected (requieres higher privilegies).");
+			LOG.warn("number of data directories (disks) per node could not be collected (requieres higher privilegies).");
 		}
 		
 		return disksPerHost;
