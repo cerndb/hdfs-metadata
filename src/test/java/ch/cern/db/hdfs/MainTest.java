@@ -21,7 +21,7 @@ public class MainTest {
 		node2.put(-1, 2);
 		hosts_diskIds.put("node2", node2);
 		
-		Main.printNodeDisksDistribution(hosts_diskIds, -1, new HashMap<String, Integer>());
+		new Main().printNodeDisksDistribution(hosts_diskIds, -1, new HashMap<String, Integer>());
 	}
 	
 	@Test
@@ -36,7 +36,7 @@ public class MainTest {
 		node2.put(-1, 28);
 		hosts_diskIds.put("node2", node2);
 		
-		Main.printNodeDisksDistribution(hosts_diskIds, -1, new HashMap<String, Integer>());
+		new Main().printNodeDisksDistribution(hosts_diskIds, -1, new HashMap<String, Integer>());
 	}
 	
 }

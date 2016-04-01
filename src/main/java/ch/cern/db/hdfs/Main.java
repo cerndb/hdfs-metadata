@@ -33,7 +33,7 @@ public class Main extends Configured implements Tool {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-	private static void printBlockMetadata(List<BlockLocation> blockLocations, String[] dataDirs,
+	private void printBlockMetadata(List<BlockLocation> blockLocations, String[] dataDirs,
 			int limitPrintedBlocks) throws IOException {
 		System.out.println();
 		System.out.println(" === Metadata of blocks and replicass ===");
@@ -63,7 +63,7 @@ public class Main extends Configured implements Tool {
 		System.out.println();
 	}
 
-	private static void printBlockMetadata(BlockLocation blockLocation, String[] dataDirs) throws IOException {
+	private void printBlockMetadata(BlockLocation blockLocation, String[] dataDirs) throws IOException {
 
 		System.out.println("	Offset: " + blockLocation.getOffset());
 		System.out.println("	Length: " + blockLocation.getLength());
@@ -104,7 +104,7 @@ public class Main extends Configured implements Tool {
 		}
 	}
 
-	static void printNodeDisksDistribution(HashMap<String, HashMap<Integer, Integer>> hosts_diskIds,
+	protected void printNodeDisksDistribution(HashMap<String, HashMap<Integer, Integer>> hosts_diskIds,
 			Integer maxNumDisks, HashMap<String, Integer> disksPerHost) {
 		
 		System.out.println();
@@ -192,7 +192,7 @@ public class Main extends Configured implements Tool {
 		System.out.println("  " + SUtils.color(Color.Y,  "-") + ": #blocks is less than 20% of the avergae of blocks per disk of this host");
 	}
 
-	private static int getMaxDiskId(HashMap<String, Integer> disksPerHost, HashMap<String, HashMap<Integer, Integer>> hosts_diskIds) {
+	private int getMaxDiskId(HashMap<String, Integer> disksPerHost, HashMap<String, HashMap<Integer, Integer>> hosts_diskIds) {
 		
 		Integer maxDiskId = -1;
 		
@@ -208,7 +208,7 @@ public class Main extends Configured implements Tool {
 		return maxDiskId;
 	}
 
-	private static void printFileStatus(FileStatus status) {
+	private void printFileStatus(FileStatus status) {
 		System.out.println();
 		System.out.println("Showing metadata for: " + status.getPath());
 		System.out.println("	isDirectory: " + status.isDirectory());
