@@ -25,7 +25,7 @@ HOME=$SCRIPT_DIR/..
 
 if `command -v "hadoop" &> /dev/null` ;
 then
-	hadoop jar $HOME/target/* ch.cern.db.hdfs.Main "$@"
+	hadoop jar $HOME/target/hdfs-metadata*.jar ch.cern.db.hdfs.Main "$@"
 else
 	HADOOP_IN_PATH=$(PATH="${HADOOP_HOME:-${HADOOP_PREFIX}}/bin:$PATH" which hadoop 2>/dev/null)
 	HADOOP_CLASSPATH=$($HADOOP_IN_PATH classpath)
