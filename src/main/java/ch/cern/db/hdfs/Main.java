@@ -185,7 +185,7 @@ public class Main extends Configured implements Tool {
 		}
 		
 		System.out.println();
-		System.out.println("Leyend");
+		System.out.println("Legend");
 		System.out.println("  " + SUtils.color(Color.R,  "0") + ": no blocks in this disk");
 		System.out.println("  " + SUtils.color(Color.Y,  "+") + ": #blocks is more than 20% of the average of blocks per disk of this host");
 		System.out.println("  " + SUtils.color(Color.G, "=") + ": #blocks is aproximatelly the avergae of blocks per disk of this host");

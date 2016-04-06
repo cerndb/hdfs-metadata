@@ -1,5 +1,7 @@
 Tool for gathering blocks and replicas meta data from HDFS. It also builds a heat map showing how replicas are distributed along disks and nodes.
 
+Find detailed information at a CERN DB blog entry dedicated to this tool: [http://db-blog.web.cern.ch/blog/daniel-lanza-garcia/2016-04-tool-visualise-block-distribution-hadoop-hdfs-cluster]
+
 Build project:
 
 ```
@@ -78,7 +80,7 @@ Data directories and disk ids
 16/03/17 17:41:57 WARN DistributedFileSystemMetadata: list of data nodes could not be got from API (requires higher privileges).
 16/03/17 17:41:57 WARN DistributedFileSystemMetadata: getting data node list from configuration file (may contain data nodes which are not active).
 
- === Distribution along nodes and disks ===
+ === Distribution across nodes and disks ===
 
 DiskId                   0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 
                          0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 Unknown   Count     Average
@@ -101,13 +103,13 @@ machine-15.cern.ch       0 = = = = = 0 0 0 = = 0 = = 0 0 = 0 + = = = = = = = = 0
 machine-16.cern.ch       0 = = = = = 0 = = = 0 0 = 0 = = 0 = = 0 0 = = 0 = + = = = = = 0 = = = = = = 0 0         64        1
 machine-17.cern.ch       0 0 = = 0 0 + = = 0 0 = = 0 0 = 0 0 = = = 0 = 0 0 = = 0 = = = = 0 0 = = = 0 = 0         42        0
 
-Leyend
+Legend
   0: no blocks in this disk
-  +: #blocks is more than 20% of the avergae of blocks per disk of this host
-  =: #blocks is aproximatilly the avergae of blocks per disk of this host
-  -: #blocks is less than 20% of the avergae of blocks per disk of this host
+  +: #blocks is more than 20% of the average of blocks per disk of this host
+  =: #blocks is aproximatelly the average of blocks per disk of this host
+  -: #blocks is less than 20% of the average of blocks per disk of this host
   
- === Metadata of blocks and replicass ===
+ === Metadata of blocks and replicas ===
 
 Block (0) info:
 	Offset: 0
