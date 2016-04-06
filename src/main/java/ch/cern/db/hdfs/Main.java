@@ -36,7 +36,7 @@ public class Main extends Configured implements Tool {
 	private void printBlockMetadata(List<BlockLocation> blockLocations, String[] dataDirs,
 			int limitPrintedBlocks) throws IOException {
 		System.out.println();
-		System.out.println(" === Metadata of blocks and replicass ===");
+		System.out.println(" === Metadata of blocks and replicas ===");
 		System.out.println();
 		
 		if(limitPrintedBlocks < 1){
@@ -73,7 +73,7 @@ public class Main extends Configured implements Tool {
 			System.out.println("	No cached hosts");
 		}
 
-		System.out.println("	Hosts:");
+		System.out.println("	Replicas:");
 		VolumeId[] volumeIds = blockLocation instanceof BlockStorageLocation ?
 				(((BlockStorageLocation) blockLocation).getVolumeIds()) : null;
 		String[] hosts = blockLocation.getHosts();
@@ -108,7 +108,7 @@ public class Main extends Configured implements Tool {
 			Integer maxNumDisks, HashMap<String, Integer> disksPerHost) {
 		
 		System.out.println();
-		System.out.println(" === Distribution along nodes and disks ===");
+		System.out.println(" === Distribution across nodes and disks ===");
 		System.out.println();
 		
 		maxNumDisks = Math.max(getMaxDiskId(disksPerHost, hosts_diskIds) + 1, maxNumDisks);
@@ -187,9 +187,9 @@ public class Main extends Configured implements Tool {
 		System.out.println();
 		System.out.println("Leyend");
 		System.out.println("  " + SUtils.color(Color.R,  "0") + ": no blocks in this disk");
-		System.out.println("  " + SUtils.color(Color.Y,  "+") + ": #blocks is more than 20% of the avergae of blocks per disk of this host");
-		System.out.println("  " + SUtils.color(Color.G, "=") + ": #blocks is aproximatilly the avergae of blocks per disk of this host");
-		System.out.println("  " + SUtils.color(Color.Y,  "-") + ": #blocks is less than 20% of the avergae of blocks per disk of this host");
+		System.out.println("  " + SUtils.color(Color.Y,  "+") + ": #blocks is more than 20% of the average of blocks per disk of this host");
+		System.out.println("  " + SUtils.color(Color.G, "=") + ": #blocks is aproximatelly the avergae of blocks per disk of this host");
+		System.out.println("  " + SUtils.color(Color.Y,  "-") + ": #blocks is less than 20% of the average of blocks per disk of this host");
 	}
 
 	private int getMaxDiskId(HashMap<String, Integer> disksPerHost, HashMap<String, HashMap<Integer, Integer>> hosts_diskIds) {
