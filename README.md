@@ -11,8 +11,10 @@ bin/compile
 Usage ([Hadoop generic options](https://hadoop.apache.org/docs/r2.6.4/hadoop-project-dist/hadoop-common/CommandsManual.html#Generic_Options) can be passed):
 
 ``` 
-bin/hdfs-blkd <path> [<max_number_of_blocks_to_print>]
+bin/hdfs-blkd [-Dhdfs.tool.blocks.dumping.path=<FILE_PATH>] <path> [<max_number_of_blocks_to_print>]
 ```
+
+If hdfs.tool.blocks.dumping.path configuration parameter is set, block distribution will be dump to specified path in CSV format.
 
 Example output:
 

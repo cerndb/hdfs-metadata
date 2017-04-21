@@ -8,6 +8,9 @@
  */
 package ch.cern.db.hdfs;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,6 +35,8 @@ import ch.cern.db.util.SUtils.Color;
 public class Main extends Configured implements Tool {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+    
+	private static final String DUMPING_PATH_CONFIG_PARAM = "hdfs.tool.blocks.dumping.path";
 
 	private void printBlockMetadata(List<BlockLocation> blockLocations, String[] dataDirs,
 			int limitPrintedBlocks) throws IOException {
@@ -225,6 +230,83 @@ public class Main extends Configured implements Tool {
 		System.out.println("	permission: " + status.getPermission());
 		System.out.println();
 	}
+	
+    public void dumpAgregattedData(
+            String path, 
+            HashMap<String, HashMap<Integer, Integer>> hosts_diskIds, 
+            int maxNumDisks,
+            HashMap<String, Integer> disksPerHost) throws IOException {
+        
+        File dumpingFile = new File(path);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(dumpingFile));
+        
+        LOG.info("Dumping aggregated data to " + dumpingFile.getCanonicalPath());
+        
+        maxNumDisks = Math.max(getMaxDiskId(disksPerHost, hosts_diskIds) + 1, maxNumDisks);
+        
+        writer.write("Host,");
+        for (int i = 0; i < maxNumDisks; i++) writer.write(i + ",");
+        writer.write("Unknown,");
+        writer.write("Count,");
+        writer.write("Average\n");
+        for (Entry<String, HashMap<Integer, Integer>> host_diskIds : hosts_diskIds.entrySet()) {
+            writer.write(host_diskIds.getKey() + ",");
+            
+            HashMap<Integer, Integer> diskIds_count = host_diskIds.getValue();
+            
+            float sum = 0;
+            int disksWithBlocksCount = 0;
+            int numDisks = disksPerHost.containsKey(host_diskIds.getKey()) ?
+                    disksPerHost.get(host_diskIds.getKey()) : maxNumDisks;
+            for (int i = 0; i < numDisks; i++){
+                Integer count = diskIds_count.get(i);
+                
+                if(count != null){
+                    sum += diskIds_count.get(i);
+                    disksWithBlocksCount++;
+                }
+            }
+            float avg = sum / disksWithBlocksCount;
+            
+            float low = (float) (avg - 0.2 * avg);
+            if(avg - low < 2)
+                low = avg - 2;          
+            float high = (float) (avg + 0.2 * avg);
+            if(high - avg < 2)
+                high = avg + 2;
+            
+            int i;
+            for (i = 0; i < numDisks; i++) {
+                Integer count = diskIds_count.get(i);
+                
+                if(count == null)
+                    writer.write("0,");
+                else if(count < low)
+                    writer.write("-,");
+                else if(count > high)
+                    writer.write("+,");
+                else
+                    writer.write("=,");
+            }
+            for (; i < maxNumDisks; i++) {
+                writer.write(",");
+            }
+            
+            Integer count_unk = diskIds_count.get(-1);
+            if(count_unk == null)
+                writer.write("0,");
+            else
+                writer.write(count_unk + ",");
+            
+            if(diskIds_count.containsKey(-1))
+                sum += diskIds_count.get(-1);
+            
+            writer.write((int) sum + ",");
+            writer.write((int) avg + "\n");
+        }
+        
+        writer.close();
+    }
 
 	public static void main(String[] args) throws Exception {
 		int res = ToolRunner.run(new Configuration(), new Main(), args);
@@ -277,6 +359,10 @@ public class Main extends Configured implements Tool {
 		printNodeDisksDistribution(hosts_diskIds, dataDirs != null ? dataDirs.length : -1, disksPerHost);
 			
 		printBlockMetadata(blockLocations, dataDirs, limitPrintedBlocks);
+		
+		String dumpingPath = getConf().get(DUMPING_PATH_CONFIG_PARAM);
+		if(dumpingPath != null)
+		    dumpAgregattedData(dumpingPath, hosts_diskIds, dataDirs != null ? dataDirs.length : -1, disksPerHost);
 	
 		return 0;
 	}
