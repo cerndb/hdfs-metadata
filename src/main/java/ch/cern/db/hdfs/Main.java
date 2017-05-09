@@ -268,25 +268,14 @@ public class Main extends Configured implements Tool {
             }
             float avg = sum / disksWithBlocksCount;
             
-            float low = (float) (avg - 0.2 * avg);
-            if(avg - low < 2)
-                low = avg - 2;          
-            float high = (float) (avg + 0.2 * avg);
-            if(high - avg < 2)
-                high = avg + 2;
-            
             int i;
             for (i = 0; i < numDisks; i++) {
                 Integer count = diskIds_count.get(i);
                 
                 if(count == null)
                     writer.write("0,");
-                else if(count < low)
-                    writer.write("-,");
-                else if(count > high)
-                    writer.write("+,");
                 else
-                    writer.write("=,");
+                    writer.write(count + ",");
             }
             for (; i < maxNumDisks; i++) {
                 writer.write(",");
